@@ -9,6 +9,7 @@
 - No se contempla edición ni eliminación de personas.
 - Se asume un volumen bajo de datos (sin paginación por ahora).
 - El sistema está pensado como base para escalar a módulos más complejos (por ejemplo, gestión de trámites).
+- El proyecto puede ejecutarse con Docker para asegurar entorno consistente.
 
 ## 2. Modelo de Datos
 
@@ -20,9 +21,12 @@
 | nombre | String  | Nombre de la persona (requerido) |
 | edad   | Integer | Edad (0–120)                   |
 
-- La persistencia se realiza utilizando SQLite por simplicidad y facilidad de ejecución local.
+- Persistencia: SQLite por simplicidad y facilidad de ejecución local.
+- Escalabilidad futura: Persona podría relacionarse con módulos como trámites o documentos usando ForeignKey.
 
 ## 3. Contratos de API
+
+Todos los endpoints empiezan con `/api/`.
 
 ### POST /api/personas/
 
@@ -32,18 +36,17 @@ Registra una nueva persona.
 
 ```json
 {
-  "nombre": "Juan",
-  "edad": 30
+  "nombre": "daniel",
+  "edad": 29
 }
-```
 
 **Response – 201 Created**
 
 ```json
 {
   "id": 1,
-  "nombre": "Juan",
-  "edad": 30
+  "nombre": "daniel",
+  "edad": 29
 }
 ```
 
@@ -62,49 +65,50 @@ Lista todas las personas registradas.
 [
   {
     "id": 1,
-    "nombre": "Juan",
-    "edad": 30
+    "nombre": "daniel",
+    "edad": 29
   }
 ]
 ```
 
 ## 4. Decisiones Técnicas
 
-- **Backend:** Django + Django REST Framework  
-  Se eligió por su ORM maduro, sistema de validaciones integrado y estructura estándar, lo que facilita escalar el proyecto a módulos más complejos sin necesidad de reestructurar la base.
+**Backend:** Django + Django REST Framework  
+- ORM maduro, validaciones integradas, estructura estándar.  
 
-- **Arquitectura:**  
-  Separación clara entre modelos, serializers y vistas, siguiendo las buenas prácticas de DRF.
+**Arquitectura:**  
+- Separación clara entre modelos, serializers y vistas.  
 
-- **Persistencia:**  
-  SQLite, por ser liviano y suficiente para el alcance del challenge.
+**Persistencia:**  
+- SQLite, suficiente para el alcance del challenge.  
 
-- **Validaciones:**  
-  Implementadas en los serializers para mantener las reglas de negocio centralizadas.
+**Validaciones:**  
+- Centralizadas en los serializers.  
+
+**Docker:**  
+- Se incluyen Dockerfiles para backend y frontend para facilitar ejecución local y futura integración/producción.  
 
 ## 5. Manejo de Errores
 
-- Uso de códigos HTTP estándar.
-- Respuestas consistentes proporcionadas por Django REST Framework.
-- Mensajes de error claros y orientados al consumidor de la API.
+- Uso de códigos HTTP estándar (200, 201, 400, 422).  
+- Mensajes consistentes y claros, proporcionados por DRF.  
+- Validaciones centralizadas en los serializers.  
 
 ## 6. Trade-offs y Futuras Mejoras
 
-Por limitaciones de tiempo y alcance, se dejaron fuera:
+**Dejados fuera por alcance:**  
+- Autenticación y autorización.  
+- Paginación y filtros avanzados.  
+- Tests automáticos exhaustivos.  
+- Deploy productivo con seguridad completa.  
 
-- Autenticación y autorización.
-- Paginación y filtros.
-- Tests automáticos más exhaustivos.
-- Deploy productivo con configuración de seguridad completa.
-
-En un entorno de producción se agregarían:
-
-- Paginación y ordenamiento.
-- Tests unitarios y de integración.
-- Autenticación (JWT u OAuth).
-- Base de datos PostgreSQL.
-- Configuración de CORS y seguridad.
+**Si fuera producción, se agregarían:**  
+- PostgreSQL en lugar de SQLite.  
+- Paginación, ordenamiento y filtros.  
+- Autenticación (JWT u OAuth).  
+- Tests unitarios e integración.  
+- Configuración completa de CORS y seguridad.  
 
 ## 7. Conclusión
 
-La solución prioriza claridad, simplicidad y extensibilidad, cumpliendo con los requisitos funcionales actuales y dejando una base sólida para futuras ampliaciones del sistema.
+La solución prioriza claridad, simplicidad y extensibilidad, cumpliendo los requisitos funcionales y dejando una base sólida para futuras ampliaciones.
